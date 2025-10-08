@@ -1,4 +1,6 @@
-# Operating Systems Cheat Sheet
+# Pthread Cheat Sheet
+
+<img src="../img/pthread/pthread.png">
 
 ## 📌 Process States and Life Cycle
 
@@ -39,20 +41,20 @@ if (pid == 0) {
 
 Replaces current process image with a new program:
 
-| Function | Description |
-|----------|-------------|
-| `execl()` | Takes argument list |
-| `execlp()` | Searches PATH |
-| `execle()` | Takes environment |
-| `execv()` | Takes argument vector |
-| `execvp()` | Vector + PATH search |
-| `execve()` | Vector + environment |
+| Function   | Description           |
+| ---------- | --------------------- |
+| `execl()`  | Takes argument list   |
+| `execlp()` | Searches PATH         |
+| `execle()` | Takes environment     |
+| `execv()`  | Takes argument vector |
+| `execvp()` | Vector + PATH search  |
+| `execve()` | Vector + environment  |
 
 ```c
 // Example: execl()
 execl("/bin/ls", "ls", "-l", NULL);
 
-// Example: execvp() 
+// Example: execvp()
 char *args[] = {"gcc", "program.c", "-o", "program", NULL};
 execvp("gcc", args);
 ```
@@ -88,7 +90,7 @@ waitpid(-1, &status, WNOHANG);
 
 int main() {
     pid_t pid = fork();
-    
+
     if (pid == 0) {
         // Child: execute new program
         execl("/bin/echo", "echo", "Hello from child!", NULL);
@@ -103,7 +105,7 @@ int main() {
         perror("fork failed");
         return 1;
     }
-    
+
     return 0;
 }
 ```
@@ -114,17 +116,17 @@ Signals are software interrupts that notify processes of events.
 
 ### Common Signals
 
-| Signal | Number | Default Action | Description |
-|--------|--------|----------------|-------------|
-| SIGHUP | 1 | Terminate | Hangup detected |
-| SIGINT | 2 | Terminate | Interrupt (Ctrl+C) |
-| SIGQUIT | 3 | Core dump | Quit (Ctrl+\) |
-| SIGKILL | 9 | Terminate | Kill (cannot be caught) |
-| SIGSEGV | 11 | Core dump | Segmentation fault |
-| SIGTERM | 15 | Terminate | Termination request |
-| SIGSTOP | 19 | Stop | Stop process |
-| SIGCONT | 18 | Continue | Continue process |
-| SIGCHLD | 17 | Ignore | Child status changed |
+| Signal  | Number | Default Action | Description             |
+| ------- | ------ | -------------- | ----------------------- |
+| SIGHUP  | 1      | Terminate      | Hangup detected         |
+| SIGINT  | 2      | Terminate      | Interrupt (Ctrl+C)      |
+| SIGQUIT | 3      | Core dump      | Quit (Ctrl+\)           |
+| SIGKILL | 9      | Terminate      | Kill (cannot be caught) |
+| SIGSEGV | 11     | Core dump      | Segmentation fault      |
+| SIGTERM | 15     | Terminate      | Termination request     |
+| SIGSTOP | 19     | Stop           | Stop process            |
+| SIGCONT | 18     | Continue       | Continue process        |
+| SIGCHLD | 17     | Ignore         | Child status changed    |
 
 ### Signal Handling
 
@@ -144,19 +146,19 @@ int main() {
     // Register signal handler
     signal(SIGINT, signal_handler);
     signal(SIGTERM, signal_handler);
-    
+
     // Advanced signal handling with sigaction
     struct sigaction sa;
     sa.sa_handler = signal_handler;
     sigemptyset(&sa.sa_mask);
     sa.sa_flags = 0;
     sigaction(SIGINT, &sa, NULL);
-    
+
     while (1) {
         printf("Running... Press Ctrl+C to exit\n");
         sleep(1);
     }
-    
+
     return 0;
 }
 ```
@@ -199,13 +201,13 @@ if (fork() == 0) {
 void* thread_function(void* arg) {
     int* data = (int*)arg;
     printf("Thread running with data: %d\n", *data);
-    
+
     // Thread-specific work
     for (int i = 0; i < 5; i++) {
         printf("Thread %d: iteration %d\n", *data, i);
         sleep(1);
     }
-    
+
     // Return value
     int* result = malloc(sizeof(int));
     *result = *data * 2;
@@ -215,7 +217,7 @@ void* thread_function(void* arg) {
 int main() {
     pthread_t threads[3];
     int thread_data[3] = {1, 2, 3};
-    
+
     // Create threads
     for (int i = 0; i < 3; i++) {
         if (pthread_create(&threads[i], NULL, thread_function, &thread_data[i]) != 0) {
@@ -223,7 +225,7 @@ int main() {
             exit(1);
         }
     }
-    
+
     // Wait for threads to complete
     for (int i = 0; i < 3; i++) {
         int* result;
@@ -231,7 +233,7 @@ int main() {
         printf("Thread %d returned: %d\n", i, *result);
         free(result);
     }
-    
+
     return 0;
 }
 ```
@@ -299,27 +301,27 @@ typedef struct {
 
 void* worker_thread(void* arg) {
     threadpool_t* pool = (threadpool_t*)arg;
-    
+
     while (1) {
         pthread_mutex_lock(&pool->queue_mutex);
-        
+
         // Wait for work or shutdown
         while (pool->queue_count == 0 && !pool->shutdown) {
             pthread_cond_wait(&pool->queue_cond, &pool->queue_mutex);
         }
-        
+
         if (pool->shutdown) {
             pthread_mutex_unlock(&pool->queue_mutex);
             pthread_exit(NULL);
         }
-        
+
         // Get task from queue
         task_t task = pool->queue[pool->queue_front];
         pool->queue_front = (pool->queue_front + 1) % pool->queue_size;
         pool->queue_count--;
-        
+
         pthread_mutex_unlock(&pool->queue_mutex);
-        
+
         // Execute task
         task.function(task.arg);
     }
@@ -327,7 +329,7 @@ void* worker_thread(void* arg) {
 
 threadpool_t* threadpool_create(int thread_count, int queue_size) {
     threadpool_t* pool = malloc(sizeof(threadpool_t));
-    
+
     pool->threads = malloc(sizeof(pthread_t) * thread_count);
     pool->queue = malloc(sizeof(task_t) * queue_size);
     pool->thread_count = thread_count;
@@ -336,34 +338,34 @@ threadpool_t* threadpool_create(int thread_count, int queue_size) {
     pool->queue_front = 0;
     pool->queue_rear = 0;
     pool->shutdown = 0;
-    
+
     pthread_mutex_init(&pool->queue_mutex, NULL);
     pthread_cond_init(&pool->queue_cond, NULL);
-    
+
     // Create worker threads
     for (int i = 0; i < thread_count; i++) {
         pthread_create(&pool->threads[i], NULL, worker_thread, pool);
     }
-    
+
     return pool;
 }
 
 int threadpool_add_task(threadpool_t* pool, void (*function)(void*), void* arg) {
     pthread_mutex_lock(&pool->queue_mutex);
-    
+
     if (pool->queue_count == pool->queue_size) {
         pthread_mutex_unlock(&pool->queue_mutex);
         return -1;  // Queue full
     }
-    
+
     pool->queue[pool->queue_rear].function = function;
     pool->queue[pool->queue_rear].arg = arg;
     pool->queue_rear = (pool->queue_rear + 1) % pool->queue_size;
     pool->queue_count++;
-    
+
     pthread_cond_signal(&pool->queue_cond);
     pthread_mutex_unlock(&pool->queue_mutex);
-    
+
     return 0;
 }
 ```
@@ -379,7 +381,7 @@ int main() {
     for (int i = 0; i < 100; i++) {
         printf("Thread %d processing %d\n", omp_get_thread_num(), i);
     }
-    
+
     // Parallel sections
     #pragma omp parallel sections
     {
@@ -392,7 +394,7 @@ int main() {
             printf("Section 2 executed by thread %d\n", omp_get_thread_num());
         }
     }
-    
+
     // Critical section
     int shared_var = 0;
     #pragma omp parallel for
@@ -402,14 +404,14 @@ int main() {
             shared_var++;
         }
     }
-    
+
     // Reduction
     int sum = 0;
     #pragma omp parallel for reduction(+:sum)
     for (int i = 1; i <= 100; i++) {
         sum += i;
     }
-    
+
     return 0;
 }
 ```
@@ -431,19 +433,19 @@ int thread_func(void* arg) {
 int main() {
     void* stack = malloc(8192);
     void* stack_top = stack + 8192;
-    
+
     // Create new thread (shares memory)
-    pid_t pid = clone(thread_func, stack_top, 
+    pid_t pid = clone(thread_func, stack_top,
                       CLONE_VM | CLONE_FS | CLONE_FILES | CLONE_SIGHAND, NULL);
-    
+
     if (pid == -1) {
         perror("clone failed");
         return 1;
     }
-    
+
     waitpid(pid, NULL, 0);
     free(stack);
-    
+
     return 0;
 }
 ```
@@ -455,8 +457,9 @@ int main() {
 A critical section is a segment of code that accesses shared resources and must not be executed by more than one process/thread simultaneously.
 
 **Requirements for Critical Section Solution:**
+
 1. **Mutual Exclusion** - Only one process in critical section at a time
-2. **Progress** - Selection of next process cannot be postponed indefinitely  
+2. **Progress** - Selection of next process cannot be postponed indefinitely
 3. **Bounded Waiting** - Bound on number of times other processes can enter CS
 
 ### Test-and-Set (TAS)
@@ -475,9 +478,9 @@ bool lock = false;
 void critical_section() {
     while (test_and_set(&lock))
         ; // Busy wait (spin lock)
-        
+
     // Critical section
-    
+
     lock = false; // Release lock
 }
 ```
@@ -528,7 +531,7 @@ int old_val = atomic_cmpxchg(&counter, 5, 10);  // if counter == 5, set to 10
 
 // Memory barriers
 smp_mb();           // Full memory barrier
-smp_rmb();          // Read memory barrier  
+smp_rmb();          // Read memory barrier
 smp_wmb();          // Write memory barrier
 ```
 
@@ -578,17 +581,17 @@ void* worker_thread(void* arg) {
 
 int main() {
     pthread_t threads[5];
-    
+
     // Create threads
     for (int i = 0; i < 5; i++) {
         pthread_create(&threads[i], NULL, worker_thread, NULL);
     }
-    
+
     // Wait for threads
     for (int i = 0; i < 5; i++) {
         pthread_join(threads[i], NULL);
     }
-    
+
     printf("Final value: %d\n", shared_resource);
     pthread_mutex_destroy(&mutex);
     return 0;
@@ -704,13 +707,13 @@ void producer() {
     int item;
     while (1) {
         item = produce_item();
-        
+
         sem_wait(&empty);   // Wait for empty slot
         sem_wait(&mutex);   // Critical section
-        
+
         buffer[in] = item;
         in = (in + 1) % BUFFER_SIZE;
-        
+
         sem_post(&mutex);   // Exit critical section
         sem_post(&full);    // Signal full slot
     }
@@ -721,13 +724,13 @@ void consumer() {
     while (1) {
         sem_wait(&full);    // Wait for full slot
         sem_wait(&mutex);   // Critical section
-        
+
         item = buffer[out];
         out = (out + 1) % BUFFER_SIZE;
-        
+
         sem_post(&mutex);   // Exit critical section
         sem_post(&empty);   // Signal empty slot
-        
+
         consume_item(item);
     }
 }
@@ -736,14 +739,14 @@ int main() {
     sem_init(&empty, 0, BUFFER_SIZE);  // Initially all empty
     sem_init(&full, 0, 0);             // Initially none full
     sem_init(&mutex, 0, 1);            // Binary semaphore
-    
+
     pthread_t prod_thread, cons_thread;
     pthread_create(&prod_thread, NULL, producer, NULL);
     pthread_create(&cons_thread, NULL, consumer, NULL);
-    
+
     pthread_join(prod_thread, NULL);
     pthread_join(cons_thread, NULL);
-    
+
     return 0;
 }
 ```
@@ -759,28 +762,28 @@ Monitors are high-level synchronization constructs that provide mutual exclusion
 monitor BoundedBuffer {
     int buffer[N];
     int count = 0, in = 0, out = 0;
-    
+
     condition not_full, not_empty;
-    
+
     void produce(int item) {
         while (count == N)
             wait(not_full);
-            
+
         buffer[in] = item;
         in = (in + 1) % N;
         count++;
-        
+
         signal(not_empty);
     }
-    
+
     int consume() {
         while (count == 0)
             wait(not_empty);
-            
+
         int item = buffer[out];
         out = (out + 1) % N;
         count--;
-        
+
         signal(not_full);
         return item;
     }
@@ -806,33 +809,33 @@ void monitor_init(monitor_t* m) {
 
 void monitor_produce(monitor_t* m, int item) {
     pthread_mutex_lock(&m->mutex);
-    
+
     while (m->count == BUFFER_SIZE) {
         pthread_cond_wait(&m->not_full, &m->mutex);
     }
-    
+
     m->buffer[m->in] = item;
     m->in = (m->in + 1) % BUFFER_SIZE;
     m->count++;
-    
+
     pthread_cond_signal(&m->not_empty);
     pthread_mutex_unlock(&m->mutex);
 }
 
 int monitor_consume(monitor_t* m) {
     pthread_mutex_lock(&m->mutex);
-    
+
     while (m->count == 0) {
         pthread_cond_wait(&m->not_empty, &m->mutex);
     }
-    
+
     int item = m->buffer[m->out];
     m->out = (m->out + 1) % BUFFER_SIZE;
     m->count--;
-    
+
     pthread_cond_signal(&m->not_full);
     pthread_mutex_unlock(&m->mutex);
-    
+
     return item;
 }
 ```
@@ -846,12 +849,12 @@ int ready = 0;
 
 void* waiter(void* arg) {
     pthread_mutex_lock(&mutex);
-    
+
     while (!ready) {
         printf("Waiting for condition...\n");
         pthread_cond_wait(&cond, &mutex);  // Releases mutex while waiting
     }
-    
+
     printf("Condition met!\n");
     pthread_mutex_unlock(&mutex);
     return NULL;
@@ -859,13 +862,13 @@ void* waiter(void* arg) {
 
 void* signaler(void* arg) {
     sleep(2);  // Simulate work
-    
+
     pthread_mutex_lock(&mutex);
     ready = 1;
     pthread_cond_signal(&cond);  // Wake up one waiter
     // pthread_cond_broadcast(&cond);  // Wake up all waiters
     pthread_mutex_unlock(&mutex);
-    
+
     return NULL;
 }
 ```
@@ -927,7 +930,7 @@ valgrind --tool=memcheck ./program
 # Helgrind for thread errors
 valgrind --tool=helgrind ./program
 
-# DRD for race condition detection  
+# DRD for race condition detection
 valgrind --tool=drd ./program
 
 # Strace for system call tracing
@@ -947,7 +950,7 @@ clock_gettime(CLOCK_MONOTONIC, &start);
 // ... code to measure ...
 
 clock_gettime(CLOCK_MONOTONIC, &end);
-double time_taken = (end.tv_sec - start.tv_sec) + 
+double time_taken = (end.tv_sec - start.tv_sec) +
                    (end.tv_nsec - start.tv_nsec) / 1e9;
 printf("Time taken: %f seconds\n", time_taken);
 ```
@@ -975,13 +978,13 @@ void transfer_money(account_t* from, account_t* to, int amount) {
     // Always lock lower address first
     pthread_mutex_t* first = (&from->mutex < &to->mutex) ? &from->mutex : &to->mutex;
     pthread_mutex_t* second = (&from->mutex < &to->mutex) ? &to->mutex : &from->mutex;
-    
+
     pthread_mutex_lock(first);
     pthread_mutex_lock(second);
-    
+
     from->balance -= amount;
     to->balance += amount;
-    
+
     pthread_mutex_unlock(second);
     pthread_mutex_unlock(first);
 }
@@ -994,11 +997,11 @@ void transfer_money(account_t* from, account_t* to, int amount) {
 void* thread_func(void* arg) {
     // Local allocation is thread-safe
     char* local_buffer = malloc(1024);
-    
+
     // Use thread_local for per-thread data
     static __thread int thread_counter = 0;
     thread_counter++;
-    
+
     // Always free resources
     free(local_buffer);
     return NULL;
