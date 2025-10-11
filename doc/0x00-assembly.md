@@ -1,6 +1,77 @@
-# Assembly x86 (AT\&T) Cheat Sheet
+# 📘 **Assembly x86 (AT&T) Cheat Sheet**
 
 <img src="../img/assembly/assembly.jpg">
+
+## 📑 Table of Contents
+
+<div style="display: flex; flex-wrap: wrap;">
+
+  <!-- Column 1 -->
+  <div style="flex: 1; min-width: 250px; margin-right: 20px;">
+    <ul>
+      <li><strong>🧠 Core Architecture</strong></li>
+      <ul>
+        <li><a href="#📌-registers-al-ah-ax-eax-rax">📌 Registers</a></li>
+        <li><a href="#📌-general-purpose-registers-and-their-roles">📌 General Purpose Registers</a></li>
+        <li><a href="#🧾-flags-eflags">🧾 Flags (EFLAGS)</a></li>
+        <li><a href="#🏷️-operand-prefixes">🏷️ Operand Prefixes</a></li>
+        <li><a href="#📍-memory-addressing">📍 Memory Addressing</a></li>
+        <li><a href="#📐-data-types">📐 Data Types</a></li>
+      </ul>
+  <li><strong>⚙️ Program Structure</strong></li>
+  <ul>
+    <li><a href="#🔧-program-structure-in-assembly">🔧 Sections (.data / .text)</a></li>
+    <li><a href="#📦-the-mov-instruction">📦 The <code>mov</code> Instruction</a></li>
+    <li><a href="#🔍-the-lea-instruction">🔍 The <code>lea</code> Instruction</a></li>
+  </ul>
+
+  <li><strong>📞 System Calls</strong></li>
+  <ul>
+    <li><a href="#📊-common-linux-syscalls-x86">📊 Common Linux Syscalls</a></li>
+    <li><a href="#📞-syscalls-examples">📞 Syscall Examples</a></li>
+  </ul>
+
+  <li><strong>➕ Arithmetic & Logic</strong></li>
+  <ul>
+    <li><a href="#➕➖-arithmetic-operations">➕➖ Arithmetic Operations</a></li>
+    <li><a href="#🔗-logical-and-bitwise-operations">🔗 Logical & Bitwise</a></li>
+    <li><a href="#🔀-shift--rotate">🔀 Shift & Rotate</a></li>
+  </ul>
+</ul>
+  </div>
+
+  <!-- Column 2 -->
+  <div style="flex: 1; min-width: 250px;">
+    <ul>
+      <li><strong>🔁 Control Flow</strong></li>
+      <ul>
+        <li><a href="#🔁-jumps">🔁 Jumps (Conditional & Unconditional)</a></li>
+        <li><a href="#🔄-looping-structures">🔄 Looping Structures</a></li>
+      </ul>
+  <li><strong>📚 Data Structures</strong></li>
+  <ul>
+    <li><a href="#📚-arrays">📚 Arrays</a></li>
+    <li><a href="#🧱-the-stack">🧱 The Stack</a></li>
+    <li><a href="#the-📥-push-and-📤-pop-instructions">📥📤 push / pop Instructions</a></li>
+  </ul>
+
+  <li><strong>🔔 Procedures & Functions</strong></li>
+  <ul>
+    <li><a href="#🔁-procedures-and-function-calls">🔁 Procedures & Function Calls</a></li>
+    <li><a href="#the-🔔-call-and-🔙-ret-instructions">🔔 call / ret Instructions</a></li>
+    <li><a href="#📞-calling-conventions">📞 Calling Conventions</a></li>
+    <li><a href="#🏗️-implementation-conventions">🏗️ Implementation Conventions</a></li>
+    <li><a href="#🧪-example-calling-scanf">🧪 Example: Calling scanf</a></li>
+  </ul>
+
+  <li><strong>🧬 Integration & Syntax</strong></li>
+  <ul>
+    <li><a href="#🧬-inline-assembly-in-c">🧬 Inline Assembly in C</a></li>
+    <li><a href="#🆚-intel-vs-at&t-syntax">🆚 Intel vs AT&T Syntax</a></li>
+  </ul>
+</ul>
+  </div>
+</div>
 
 ## 📌 Registers: AL, AH, AX, EAX, RAX
 
