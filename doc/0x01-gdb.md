@@ -1,4 +1,4 @@
-# 🛠️ pwndbg Cheat Sheet
+# pwndbg Cheat Sheet
 
 <img src="../img/gdb/gdb.png">
 

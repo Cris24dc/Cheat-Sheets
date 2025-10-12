@@ -1,4 +1,4 @@
-# 📘 **Assembly x86 (AT&T) Cheat Sheet**
+# **Assembly x86 (AT&T) Cheat Sheet**
 
 <img src="../img/assembly/assembly.jpg">
 
