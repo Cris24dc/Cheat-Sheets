@@ -2,16 +2,106 @@
 
 <img src="../img/gdb/gdb.png">
 
-## 📌 Installation & Setup
+## 📑 Table of Contents
 
-```bash
-# Install pwndbg
-git clone https://github.com/pwndbg/pwndbg
-cd pwndbg
-./setup.sh
+<div style="display: flex; flex-wrap: wrap;">
 
-# Start with pwndbg
-gdb ./binary
+  <!-- Column 1 -->
+  <div style="flex: 1; min-width: 250px; margin-right: 20px;">
+    <ul>
+      <li><strong>🎯 Core Debugging</strong></li>
+      <ul>
+        <li><a href="#📋-interface-structure">📋 Interface Structure</a></li>
+        <li><a href="#🎯-basic-navigation-commands">🎯 Basic Navigation Commands</a></li>
+        <li><a href="#🔁-stepping--single-stepping-detailed">🔁 Stepping / Single-Stepping</a></li>
+        <li><a href="#🔍-breakpoint-management">🔍 Breakpoint Management</a></li>
+        <li><a href="#📊-register-inspection">📊 Register Inspection</a></li>
+        <li><a href="#🧠-memory-examination">🧠 Memory Examination</a></li>
+      </ul>
+
+  <li><strong>📋 Stack & Execution</strong></li>
+  <ul>
+    <li><a href="#📋-stack-analysis">📋 Stack Analysis</a></li>
+    <li><a href="#✅-stack-trace">✅ Stack Trace</a></li>
+    <li><a href="#🔧-code-analysis">🔧 Code Analysis</a></li>
+    <li><a href="#🔄-process-control">🔄 Process Control</a></li>
+  </ul>
+
+  <li><strong>🔍 Search & Memory</strong></li>
+  <ul>
+    <li><a href="#🔍-search-and-find">🔍 Search and Find</a></li>
+    <li><a href="#📊-advanced-memory-operations">📊 Advanced Memory Operations</a></li>
+    <li><a href="#🔍-memory-layout-analysis">🔍 Memory Layout Analysis</a></li>
+  </ul>
+</ul>
+  </div>
+
+  <!-- Column 2 -->
+  <div style="flex: 1; min-width: 250px;">
+    <ul>
+      <li><strong>🏗️ Heap & Dynamic Analysis</strong></li>
+      <ul>
+        <li><a href="#🏗️-heap-analysis">🏗️ Heap Analysis</a></li>
+        <li><a href="#🔗-dynamic-analysis">🔗 Dynamic Analysis</a></li>
+      </ul>
+
+  <li><strong>🎮 Exploitation & Security</strong></li>
+  <ul>
+    <li><a href="#🎮-exploitation-helpers">🎮 Exploitation Helpers</a></li>
+    <li><a href="#🛡️-security-analysis">🛡️ Security Analysis</a></li>
+  </ul>
+
+  <li><strong>🧠 Information & Configuration</strong></li>
+  <ul>
+    <li><a href="#📝-information-gathering">📝 Information Gathering</a></li>
+    <li><a href="#🎨-customization--configuration">🎨 Customization & Configuration</a></li>
+    <li><a href="#🖨️-print--examine--display">🖨️ Print / Examine / Display</a></li>
+  </ul>
+
+  <li><strong>🔍 Debugging Techniques</strong></li>
+  <ul>
+    <li><a href="#🔍-debugging-techniques">🔍 General Debugging Techniques</a></li>
+    <li><a href="#🧱-buffer-overflow-analysis">🧱 Buffer Overflow Analysis</a></li>
+    <li><a href="#🧾-format-string-analysis">🧾 Format String Analysis</a></li>
+    <li><a href="#🏗️-return-to-libc-analysis">🏗️ Return-to-libc Analysis</a></li>
+  </ul>
+
+  <li><strong>⚡ Essentials</strong></li>
+  <ul>
+    <li><a href="#⚡-essential-pwndbg-commands">⚡ Essential pwndbg Commands</a></li>
+    <li><a href="#📚-help--docs">📚 Help & Docs</a></li>
+  </ul>
+</ul>
+  </div>
+</div>
+
+## 📋 Interface Structure
+
+```yaml
+┌─────────────────────────────────────────────────────────────────────────────┐
+│ Registers                                         │ Assembly / Machine Code │
+│                                                   │ 0x401000: mov rdi, rax  │
+│  RAX = 0x7fffffffe0a0                             │ 0x401005: call 0x400f00 │
+│  RBX = 0x0                                        │ 0x40100A: nop           │
+│ *RSP = 0x7fffffffe0b0 (* = newly modified)        │                         |
+│  RBP = 0x7fffffffe120                             │_________________________│
+│  RIP = 0x401000 -> mov rdi, rax (instruction at RIP shown)                  │
+│  RDI = 0x601050 -> 0x601050: 0x2f2f62696e2f7368 (points to "/bin/sh")       │
+└─────────────────────────────────────────────────────────────────────────────┘
+┌─────────────────────────────────────────────────────────────────────────────┐
+│ Source (if available)     │ Stack (growing down)                            |
+│                           │ 0x7fffffffe0b0 : 0x00000000004010FF (ret addr)  │
+│ 1 int main() {            │ 0x7fffffffe0b8 : 0x0000000000601050 (arg ptr)   │
+│ 2 char *s = "/bin/sh";    │ 0x7fffffffe0c0 : 0x0000000000000000 (saved rbp) │
+│ 3 system(s);              │                                                 │
+│ 4 }                       │                                                 │
+└─────────────────────────────────────────────────────────────────────────────┘
+┌─────────────────────────────────────────────────────────────────────────────┐
+│ Stack Frames / Backtrace                                                    │
+│ 0 0x401005 in main (s=0x601050) at main.c:3                                 │
+│ 1 0x400f00 in __libc_start_main (args...)                                   │
+│ 2 0x400e90 in _start                                                        │
+└─────────────────────────────────────────────────────────────────────────────┘
 ```
 
 ## 🎯 Basic Navigation Commands
@@ -20,36 +110,70 @@ gdb ./binary
 (gdb) b main           # Set breakpoint at main
 (gdb) b *0x401000      # Set breakpoint at address
 (gdb) b function+10    # Set breakpoint at offset
+(gdb) b +2             # Set breakpoint 2 lines forward from current source line
+(gdb) b myfunc         # Break at start of function `myfunc` (alias: b fn)
 (gdb) r                # Run program
 (gdb) r arg1 arg2      # Run with arguments
 (gdb) c                # Continue execution
-(gdb) s                # Step into (single instruction)
-(gdb) si               # Step instruction
+(gdb) s                # Step into (source-level)
+(gdb) si               # Step one instruction (alias: stepi, si)
 (gdb) n                # Next (step over)
-(gdb) ni               # Next instruction
+(gdb) ni               # Next instruction (alias: nexti, ni)
 (gdb) finish           # Run until current function returns
 (gdb) q                # Quit gdb
 ```
+
+## 🔁 Stepping / Single-Stepping (detailed)
+
+Use these to control execution one source line or one instruction at a time.
+
+```bash
+# Source-level stepping
+step, s              # Step into next source line (steps into function calls)
+step N               # Repeat step N times
+
+# Instruction-level stepping
+stepi, si            # Step a single machine instruction
+stepi N              # Step N instructions
+
+# Step-over variants
+next, n              # Step over (do not enter functions)
+nexti, ni            # Step over a single instruction (on some gdb builds it's alias 'ni')
+next N               # Repeat next N times
+
+# Other useful step-style commands
+finish               # Run until current function returns
+until                # Run until a source location past the current one is reached
+return               # Make current function return (optionally supply value)
+```
+
+> Tip: `si`/`stepi` are for instruction-level debugging (useful when debugging assembly); `s`/`step` are for source-level.
 
 ## 🔍 Breakpoint Management
 
 ```bash
 # Setting breakpoints
 b main                 # Break at function
-b *0x401234           # Break at address
-b file.c:42           # Break at line number
-tb main               # Temporary breakpoint
-watch variable        # Break when variable changes
-rwatch variable       # Break when variable is read
-awatch variable       # Break on read/write access
+b *0x401234            # Break at address
+b file.c:42            # Break at line number
+tb main                # Temporary breakpoint
+b +N                   # Break N lines down from current source line (relative line offset)
+b -N                   # Break N lines up from current source line
+b func+10              # Break at function+offset (bytes/instructions)
+b myfunc               # Break at function `myfunc` (also shown as b fn)
+watch variable         # Break when variable changes
+rwatch variable        # Break when variable is read
+awatch variable        # Break on read/write access
 
 # Managing breakpoints
-info breakpoints      # List all breakpoints
-delete 1              # Delete breakpoint 1
-delete                # Delete all breakpoints
-disable 1             # Disable breakpoint 1
-enable 1              # Enable breakpoint 1
-clear                 # Clear breakpoint at current location
+info breakpoints       # List all breakpoints
+delete 1               # Delete breakpoint 1
+delete                 # Delete all breakpoints
+disable 1              # Disable breakpoint 1
+enable 1               # Enable breakpoint 1
+clear                  # Clear breakpoint at current location
+ignore 1 N             # Ignore breakpoint 1 the next N times
+commands 1             # Set commands to run when breakpoint 1 is hit
 ```
 
 ## 📊 Register Inspection
@@ -77,7 +201,7 @@ x/10i $eip            # 10 instructions from EIP
 x/s 0x401000          # String at address
 x/10c $rax            # 10 characters from RAX
 
-# Format specifiers
+# Format specifiers (x uses format + size):
 x/x   # Hexadecimal
 x/d   # Decimal
 x/u   # Unsigned decimal
@@ -86,7 +210,16 @@ x/t   # Binary
 x/c   # Character
 x/s   # String
 x/i   # Instruction
+#  size modifiers:  b (byte), h (halfword 2B), w (word 4B), g (giant word 8B)
+
+# Examples including the requested x/g (hex view with 64-bit units):
+# Print 4 giant words (8-byte units) in hex from $rsp
+x/4xg $rsp            # 4 hex 8-byte values from RSP
+# Print 8 floats as 8-byte (double) units
+x/8fg 0x601000        # format f (float/double) with g-size (64-bit units)
 ```
+
+> Note: the `g` after the format is a size modifier meaning a giant word (64-bit) — e.g. `x/4xg` = 4 × hex × 8-byte units. See `help x` in gdb for details.
 
 ### pwndbg Enhanced Memory Commands
 
@@ -108,14 +241,19 @@ stack                 # pwndbg stack view
 stack 20              # Show 20 stack entries
 backtrace             # Show call stack
 bt                    # Show call stack (short)
+bt full               # Show full backtrace with locals/args
 frame                 # Show current frame
 frame 1               # Switch to frame 1
-up                    # Move up one frame
-down                  # Move down one frame
+up, u                 # Move up one frame (alias: u)
+down, d               # Move down one frame (alias: d)
+up N                  # Move up N frames (alias: u N)
+down N                # Move down N frames (alias: d N)
 
 # Stack manipulation
 set $esp = $esp + 4   # Adjust stack pointer
 ```
+
+> Note: `u` and `d` are common short aliases for `up` and `down` and accept a numeric argument, e.g. `u 2` moves two frames up.
 
 ## 🔧 Code Analysis
 
@@ -127,17 +265,19 @@ disass $eip,+10       # 10 instructions from current
 u $eip                # pwndbg disassemble at EIP
 u $eip 20             # 20 instructions from EIP
 nearpc                # Instructions around PC
-context               # Show full context (pwndbg)
+context               # Show full context (pwndbg) — this refreshes the pwndbg interface
 ```
+
+> Tip: `context` (or `ctx`) will refresh pwndbg's contextual UI (registers, code, stack) after stops — handy to redraw the interface after running commands that change state.
 
 ## 🔍 Search and Find
 
 ```bash
 # Search in memory
 search "string"       # Search for string
-search 0x41414141     # Search for value
+search 0x41414141      # Search for value
 search -t string "hello"  # Search for string type
-find &system          # Find system function
+find &system           # Find system function
 
 # Pattern search
 pattern create 100    # Create cyclic pattern
@@ -152,8 +292,8 @@ cyclic -l 0x61616161  # Find offset of pattern
 # Heap inspection
 heap                  # Show heap information
 bins                  # Show heap bins
-fastbins             # Show fastbins
-tcache               # Show tcache bins
+fastbins              # Show fastbins
+tcache                # Show tcache bins
 vis                   # Visualize heap chunks
 malloc_chunk addr     # Show chunk information
 ```
@@ -303,32 +443,7 @@ cat /proc/sys/kernel/randomize_va_space
 info functions __stack_chk_fail
 ```
 
-## 📱 Mobile/ARM Debugging
-
-```bash
-# ARM-specific commands
-i r r0 r1 r2 r3       # ARM argument registers
-i r lr pc sp          # Important ARM registers
-x/i $pc               # Current instruction (ARM)
-set architecture arm  # Set ARM architecture
-```
-
-## 🔧 Scripting & Automation
-
-```bash
-# GDB scripting
-source script.gdb     # Load GDB script
-python print("Hello") # Execute Python
-python-interactive    # Python shell
-
-# Logging
-set logging on        # Enable logging
-set logging file log.txt # Set log file
-```
-
-## ⚡ Quick Reference Commands
-
-### Essential pwndbg Commands
+## ⚡ Essential pwndbg Commands
 
 ```bash
 start                 # Start and break at entry
@@ -339,21 +454,8 @@ vmmap                 # Memory layout
 checksec              # Security check
 search "string"       # Find string
 pattern create 100    # Create pattern
-cyclic 100           # Generate cyclic
-disass main          # Disassemble
-```
-
-### One-liners for Common Tasks
-
-```bash
-# Find RIP control
-python print("A" * 100)
-# Generate pattern
-pattern create 200
-# Find offset
-pattern offset $rip
-# Check protections
-checksec
+cyclic 100            # Generate cyclic
+disass main           # Disassemble
 ```
 
 ## 🔍 Memory Layout Analysis
@@ -370,46 +472,38 @@ ldd binary            # Show linked libraries
 info shared           # Loaded shared libraries
 ```
 
-## 🎯 Exploitation Workflow
+## 🖨️ Print / Examine / Display
 
-1. **Reconnaissance**
+```bash
+# Print values (expressions)
+print expr            # Print expression (alias: p expr)
+p/x var               # Print var in hex
+p/t var               # Print var in binary
+p/a var               # Print as address
+print &var            # Print address of var
 
-   ```bash
-   checksec
-   info functions
-   disass main
-   ```
+# Use output-format with print
+print /x var          # Print value in hex using format-suffix
+print /f var          # Print floating point
 
-2. **Vulnerability Discovery**
+# Examine memory at address (x) vs print
+x/g $rsp              # Examine memory with unit size 'g' (64-bit)
+```
 
-   ```bash
-   pattern create 200
-   r $(python -c "print 'A'*200")
-   pattern offset $rip
-   ```
+## ✅ Stack Trace
 
-3. **Exploit Development**
+```bash
+bt                    # Backtrace (stack trace)
+bt full               # Backtrace with local variables and args
+backtrace             # Synonym for bt
+frame                 # Show current frame info
+```
 
-   ```bash
-   search "/bin/sh"
-   p system
-   rop --grep "pop rdi"
-   ```
+## 📚 Help & Docs
 
-4. **Payload Testing**
-   ```bash
-   r $(python exploit.py)
-   telescope $esp
-   continue
-   ```
-
-## 🚀 Pro Tips
-
-- Use `context` after each step to see full state
-- `telescope` is your best friend for stack analysis
-- `pattern create/offset` for finding buffer overflows
-- `vmmap` to understand memory layout
-- `checksec` to identify available mitigations
-- Use `search` to find strings and gadgets
-- `heap` and `bins` for heap exploitation
-- Save frequently used commands in `.gdbinit`
+```bash
+help                  # GDB help
+help x                # Help for x command
+help break            # Help for break command
+help print            # Help for print command
+```
