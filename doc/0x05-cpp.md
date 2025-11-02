@@ -1,3 +1,5 @@
+Gata, am tradus înapoi în engleză secțiunile noi pe care le-am adăugat.
+
 # C++ Cheat Sheet
 
 <img src="../img/cpp/cpp.jpg">
@@ -10,6 +12,8 @@
 <ul>
 <li><strong>🧠 Core Language Differences (vs. C)</strong></li>
 <ul>
+<li><a href="#❓-ternary-operator">❓ Ternary Operator</a></li>
+<li><a href="#🚶-iterators">🚶 Iterators</a></li>
 <li><a href="#🔗-pointers--references">🔗 Pointers & References</a></li>
 <li><a href="#💾-memory-allocation">💾 Memory Allocation (new/delete)</a></li>
 <li><a href="#🎯-null-vs-nullptr">🎯 NULL vs nullptr</a></li>
@@ -21,24 +25,33 @@
 <li><strong>📦 Type System & Initialization</strong></li>
 <ul>
 <li><a href="#🔄-c-style-casting">🔄 C++ Style Casting</a></li>
-<li><a href="https://www.google.com/search?q=%23%F0%9F%8E%AF-type-punning">🎯 Type Punning</a></li>
+<li><a href="[https://www.google.com/search?q=%23%F0%9F%8E%AF-type-punning](https://www.google.com/search?q=%23%F0%9F%8E%AF-type-punning)">🎯 Type Punning</a></li>
 <li><a href="#⚙️-the-auto-keyword--type-inference">⚙️ The `auto` Keyword & Type Inference</a></li>
 <li><a href="#📋-initializer-lists--uniform-initialization">📋 Initializer Lists & Uniform Initialization</a></li>
+</ul>
+<li><strong>🔌 Linkage</strong></li>
+<ul>
+<li><a href="#🔌-linkage-static-vs-dynamic">🔌 Linkage (Static vs. Dynamic)</a></li>
 </ul>
 <li><strong>🔐 Const & Mutability</strong></li>
 <ul>
 <li><a href="#🔐-const-keyword">🔐 const Keyword</a></li>
 <li><a href="#🔧-mutable-keyword">🔧 mutable Keyword</a></li>
 </ul>
-<li><strong>Functions & Callables</strong></li>
-<ul>
-<li><a href="#🎯-function-pointers--lambdas">🎯 Function Pointers & Lambdas</a></li>
-</ul>
 </ul>
 </div>
 
 <div style="flex: 1; min-width: 250px;">
 <ul>
+<li><strong>Functions & Callables</strong></li>
+<ul>
+<li><a href="#🎯-function-pointers--lambdas">🎯 Function Pointers & Lambdas</a></li>
+<li><a href="#🔧-default-parameter-functions">🔧 Default Parameter Functions</a></li>
+</ul>
+<li><strong>Exception Handling</strong></li>
+<ul>
+<li><a href="#💥-try---catch---throw">💥 Try - Catch - Throw</a></li>
+</ul>
 <li><strong>Templates</strong></li>
 <ul>
 <li><a href="#🛠️-template-functions">🛠️ Template Functions</a></li>
@@ -56,17 +69,56 @@
 <li><a href="#🌊-stdstringstream">🌊 std::stringstream</a></li>
 <li><a href="#🔍-stdregex">🔍 std::regex</a></li>
 </ul>
-<li><strong>Miscellaneous</strong></li>
-<ul>
-<li><a href="#❓-ternary-operator">❓ Ternary Operator</a></li>
-<li><a href="#🚶-iterators">🚶 Iterators</a></li>
-</ul>
 </ul>
 </div>
 
 </div>
 
----
+## ❓ Ternary Operator
+
+Identical to C.
+`condition ? expression_if_true : expression_if_false`
+
+```cpp
+int x = 10;
+int y = 20;
+int max_val = (x > y) ? x : y; // max_val is 20
+```
+
+## 🚶 Iterators
+
+An **iterator** is an object that acts like a "generalized pointer." It's the core concept that connects STL algorithms to STL containers. It provides a uniform API for traversing a sequence of elements, regardless of how that sequence is stored (e.g., in an array, a list, etc.).
+
+Since you are not covering STL containers, think of them as an abstraction over pointers.
+
+```cpp
+#include <vector> // (Included just for a C++ style example)
+
+int C_array[] = {10, 20, 30, 40, 50};
+
+// C-style "iteration" using pointers
+for (int* ptr = C_array; ptr != C_array + 5; ++ptr) {
+    std::cout << *ptr << " "; // 10 20 30 40 50
+}
+
+// C++ style "iteration" using iterators
+std::vector<int> vec = {10, 20, 30, 40, 50};
+
+for (std::vector<int>::iterator it = vec.begin(); it != vec.end(); ++it) {
+    std::cout << *it << " "; // 10 20 30 40 50
+}
+
+// C++11 "range-based for loop" (syntactic sugar for iterators)
+for (int val : vec) {
+    std::cout << val << " "; // 10 20 30 40 50
+}
+```
+
+| Iterator "Pointer"  | `vec.begin()`  | Returns an iterator to the _first_ element.         |
+| ------------------- | -------------- | --------------------------------------------------- |
+| Iterator "Null"     | `vec.end()`    | Returns an iterator to _one-past-the-last_ element. |
+| Dereference         | `*it`          | Accesses the element's value.                       |
+| Increment           | `++it`         | Moves the iterator to the next element.             |
 
 ## 🔗 Pointers & References
 
@@ -77,7 +129,7 @@ Pointers in C++ function identically to C, holding a memory address.
 ```cpp
 int x = 10;
 int* ptr = &x; // 'ptr' stores the address of 'x'
-*ptr = 20;     // 'x' is now 20
+*ptr = 20;     // 'x' is now 20
 ```
 
 ### References (C++ Only)
@@ -93,57 +145,53 @@ int y = 50;
 // ref = y; (ILLEGAL! Cannot reseat a reference. This assigns 'y' (50) to 'x')
 ```
 
-| Feature                   | Pointer (`int* p`)                          | Reference (`int& r`)                              |
-| ------------------------- | ------------------------------------------- | ------------------------------------------------- |
-| **Can be NULL?**          | **Yes** (`p = nullptr;`)                    | **No**. Must be initialized.                      |
-| **Can be Reseated?**      | **Yes** (`p = &another_var;`)               | **No**. Always refers to the same variable.       |
-| **Needs Initialization?** | No (`int* p;` is valid)                     | **Yes** (`int& r = var;`)                         |
-| **Syntax**                | Dereference (`*p`)                          | Direct access (`r`)                               |
-| **Primary Use**           | Optional values, C-style APIs, heap memory. | Function parameters (pass-by-reference), aliases. |
+| Feature                    | Pointer (`int* p`)                           | Reference (`int& r`)                              |
+| -------------------------- | -------------------------------------------- | ------------------------------------------------- |
+| **Can be NULL?**           | **Yes** (`p = nullptr;`)                     | **No**. Must be initialized.                      |
+| **Can be Reseated?**       | **Yes** (`p = &another_var;`)                | **No**. Always refers to the same variable.       |
+| **Needs Initialization?**  | No (`int* p;` is valid)                      | **Yes** (`int& r = var;`)                         |
+| **Syntax**                 | Dereference (`*p`)                           | Direct access (`r`)                               |
+| **Primary Use**            | Optional values, C-style APIs, heap memory.  | Function parameters (pass-by-reference), aliases. |
 
 **Pass-by-Reference:** Using references for function parameters is cleaner than using pointers as it avoids `*` and `&` syntax at the call site and guarantees the value is not null.
 
 ```cpp
 // C-style (pass-by-pointer)
 void increment_c(int* p) {
-    if (p != NULL) {
-        (*p)++;
-    }
+    if (p != NULL) {
+        (*p)++;
+    }
 }
 increment_c(&x);
 
 // C++ style (pass-by-reference)
 void increment_cpp(int& r) {
-    r++; // No null check needed
+    r++; // No null check needed
 }
 increment_cpp(x);
 ```
-
----
 
 ## 💾 Memory Allocation (new/delete)
 
 C++ replaces `malloc()`/`free()` with the `new` and `delete` operators. These operators are type-aware (they call constructors/destructors, which is crucial for OOP).
 
-| C (`<stdlib.h>`)                                | C++ (Modern)                                 |
-| ----------------------------------------------- | -------------------------------------------- |
-| `int* p = (int*)malloc(sizeof(int));`           | `int* p = new int;`                          |
-| `int* arr = (int*)callalloca(10, sizeof(int));` | `int* arr = new int[10];` (Zero-initializes) |
-| `free(p);`                                      | `delete p;`                                  |
-| `free(arr);`                                    | `delete[] arr;`                              |
+| C (`<stdlib.h>`)                                 | C++ (Modern)                                  |
+| ------------------------------------------------ | --------------------------------------------- |
+| `int* p = (int*)malloc(sizeof(int));`            | `int* p = new int;`                           |
+| `int* arr = (int*)callalloca(10, sizeof(int));`  | `int* arr = new int[10];` (Zero-initializes)  |
+| `free(p);`                                       | `delete p;`                                   |
+| `free(arr);`                                     | `delete[] arr;`                               |
 
 **Critial:** You **must** use `delete[]` for memory allocated with `new[]`. Mismatching `delete` and `delete[]` (or mixing `malloc`/`delete`) is undefined behavior.
 
 **Modern Practice:** Avoid `new`/`delete` entirely. Use **Smart Pointers**.
 
----
-
 ## 🎯 NULL vs nullptr
 
-| Macro / Keyword | C          | C++              | Why?                                                                                                                                                                              |
-| --------------- | ---------- | ---------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `NULL`          | `(void*)0` | `0` (an `int`)   | In C, `(void*)0` is a null pointer.                                                                                                                                               |
-| `nullptr`       | N/A        | `std::nullptr_t` | `NULL` in C++ is just the integer `0`, which leads to ambiguity in function overloading (e.g., `foo(int)` vs. `foo(char*)`). `nullptr` is a true, type-safe null pointer keyword. |
+| Macro / Keyword  | C           | C++               | Why?                                                                                                                                                                               |
+| ---------------- | ----------- | ----------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `NULL`           | `(void*)0`  | `0` (an `int`)    | In C, `(void*)0` is a null pointer.                                                                                                                                                |
+| `nullptr`        | N/A         | `std::nullptr_t`  | `NULL` in C++ is just the integer `0`, which leads to ambiguity in function overloading (e.g., `foo(int)` vs. `foo(char*)`). `nullptr` is a true, type-safe null pointer keyword.  |
 
 **Rule:** In C++, **always** use `nullptr` instead of `NULL` or `0` for pointers.
 
@@ -154,8 +202,6 @@ void func(char* s) { /*...*/ }
 func(NULL); // Calls func(int) in C++! (NULL is 0)
 func(nullptr); // Correctly calls func(char*)
 ```
-
----
 
 ## 🧩 struct, enum, union
 
@@ -201,28 +247,24 @@ if (c == ScopedColor::RED) { /* ... */ }
 
 Unions work largely the same as in C. However, they are less common in C++ for type punning (see [Type Punning](https://www.google.com/search?q=%23%F0%9F%8E%AF-type-punning)).
 
----
-
 ## 🔒 `static` Keyword
 
 The `static` keyword has multiple meanings based on its context, similar to C, but with a C++ nuance.
 
-| Context                          | C                                                        | C++                                                       |
-| -------------------------------- | -------------------------------------------------------- | --------------------------------------------------------- |
-| **Local Variable** (in function) | Preserves value between calls. Initialized once.         | Same.                                                     |
-| **Global Variable**              | **Internal Linkage**. Visible only within its `.c` file. | Same. **Deprecated**. Use _anonymous namespaces_ instead. |
-| **Global Function**              | **Internal Linkage**. Visible only within its `.c` file. | Same. **Deprecated**. Use _anonymous namespaces_ instead. |
-| **Class Member** (OOP)           | N/A                                                      | Shared variable/function for all instances of a class.    |
+| Context                           | C                                                         | C++                                                        |
+| --------------------------------- | --------------------------------------------------------- | ---------------------------------------------------------- |
+| **Local Variable** (in function)  | Preserves value between calls. Initialized once.          | Same.                                                      |
+| **Global Variable**               | **Internal Linkage**. Visible only within its `.c` file.  | Same. **Deprecated**. Use _anonymous namespaces_ instead.  |
+| **Global Function**               | **Internal Linkage**. Visible only within its `.c` file.  | Same. **Deprecated**. Use _anonymous namespaces_ instead.  |
+| **Class Member** (OOP)            | N/A                                                       | Shared variable/function for all instances of a class.     |
 
 ```cpp
 // C++ alternative to 'static global'
 namespace {
-  int g_internal_var = 10; // Only visible in this .cpp file
-  void internal_func() { /* ... */ } // Only visible in this .cpp file
+  int g_internal_var = 10; // Only visible in this .cpp file
+  void internal_func() { /* ... */ } // Only visible in this .cpp file
 }
 ```
-
----
 
 ## 📚 Namespaces
 
@@ -230,8 +272,8 @@ Namespaces are a C++ feature to prevent naming conflicts by grouping code under 
 
 ```cpp
 namespace MyMath {
-  const double PI = 3.14159;
-  int add(int a, int b) { return a + b; }
+  const double PI = 3.14159;
+  int add(int a, int b) { return a + b; }
 }
 
 // Access using scope resolution operator ::
@@ -249,23 +291,17 @@ int sum_2 = add(1, 2); // 'add' is now accessible
 
 **Best Practice:** Avoid `using namespace ...` in header files as it pollutes the global namespace for everyone who includes it. `using` declarations are safer.
 
----
-
 ## ⚙️ Macros
 
 C-style macros (`#define`) are still available but **strongly discouraged** in C++.
 
-| C Macro                                     | C++ Alternative                                                      | Why?                                                                                |
-| ------------------------------------------- | -------------------------------------------------------------------- | ----------------------------------------------------------------------------------- |
-| `#define PI 3.14`                           | `const double PI = 3.14;` <br> `constexpr double PI = 3.14;` (C++11) | Macros are not type-safe and have no scope. `const`/`constexpr` are real variables. |
-| `#define MAX(a, b) ((a) > (b) ? (a) : (b))` | `template<typename T> T max(T a, T b) { return a > b ? a : b; }`     | Macros can have side effects (e.g., `MAX(++x, y)`). Templates are type-safe.        |
-| `#define LOG(msg) printf("%s\n", msg)`      | `inline void LOG(const char* msg) { std::cout << msg << "\n"; }`     | `inline` functions are type-safe and respect namespaces.                            |
-
----
+| C Macro                                      | C++ Alternative                                                       | Why?                                                                                 |
+| -------------------------------------------- | --------------------------------------------------------------------- | ------------------------------------------------------------------------------------ |
+| `#define PI 3.14`                            | `const double PI = 3.14;` <br> `constexpr double PI = 3.14;` (C++11)  | Macros are not type-safe and have no scope. `const`/`constexpr` are real variables.  |
+| `#define MAX(a, b) ((a) > (b) ? (a) : (b))`  | `template<typename T> T max(T a, T b) { return a > b ? a : b; }`      | Macros can have side effects (e.g., `MAX(++x, y)`). Templates are type-safe.         |
+| `#define LOG(msg) printf("%s\n", msg)`       | `inline void LOG(const char* msg) { std::cout << msg << "\n"; }`      | `inline` functions are type-safe and respect namespaces.                             |
 
 ## 📦 Type System & Initialization
-
----
 
 ### 🔄 C++ Style Casting
 
@@ -273,89 +309,86 @@ C++ replaces C-style casts (`(type)value`) with four specific, safer casting ope
 
 1.  **`static_cast<T>(expr)`**
 
-    - The "normal" cast for compatible types.
-    - Used for conversions like `int` to `float`, or pointer-to-base to pointer-to-derived (OOP).
-    - Fails at compile-time if types are incompatible (e.g., `int*` to `float*`).
+- The "normal" cast for compatible types.
+      - Used for conversions like `int` to `float`, or pointer-to-base to pointer-to-derived (OOP).
+      - Fails at compile-time if types are incompatible (e.g., `int*` to `float*`).
 
-    <!-- end list -->
-
-    ```cpp
-    float f = 9.5f;
-    int i = static_cast<int>(f); // OK (value is 9)
-    ```
+```cpp    
+float f = 9.5f;    
+int i = static_cast<int>(f); // OK (value is 9)    
+```
 
 2.  **`reinterpret_cast<T>(expr)`**
 
-    - The most dangerous cast. Re-interprets the underlying bit pattern.
-    - Used for low-level, non-portable tasks, like casting a pointer to an integer or to a completely different pointer type.
-    - This is the C++ equivalent of a C-style "force-cast."
+- The most dangerous cast. Re-interprets the underlying bit pattern.
+- Used for low-level, non-portable tasks, like casting a pointer to an integer or to a completely different pointer type.
+- This is the C++ equivalent of a C-style "force-cast."
 
-    <!-- end list -->
-
-    ```cpp
-    int i = 0x41424344; // "ABCD" in ASCII
-    char* c = reinterpret_cast<char*>(&i);
-    // 'c' now points to the bytes of 'i'
-    ```
+```cpp    
+int i = 0x41424344;
+// "ABCD" in ASCII    
+// char* c = reinterpret_cast<char*>(&i);    
+// 'c' now points to the bytes of 'i'
+```
 
 3.  **`const_cast<T>(expr)`**
 
-    - Used _only_ to add or remove `const` (or `volatile`).
-    - Its only legitimate use is to interface with old C APIs that don't use `const` correctly. Modifying a truly `const` object is undefined behavior.
+- Used _only_ to add or remove `const` (or `volatile`).
+      - Its only legitimate use is to interface with old C APIs that don't use `const` correctly. Modifying a truly `const` object is undefined behavior.
 
-    <!-- end list -->
-
-    ```cpp
-    void legacy_c_func(char* s); // Doesn't modify 's', but missing 'const'
-    const char* my_str = "hello";
-    legacy_c_func(const_cast<char*>(my_str)); // OK, as long as func doesn't write
-    ```
+```cpp
+void legacy_c_func(char* s); // Doesn't modify 's', but missing 'const'    
+// const char* my_str = "hello";    
+// legacy_c_func(const_cast<char*>(my_str)); // OK, as long as func doesn't write    
+```
 
 4.  **`dynamic_cast<T>(expr)`**
 
-    - Used _only_ for polymorphic OOP types (requires virtual functions).
-    - Safely casts a base-class pointer to a derived-class pointer, returning `nullptr` (for pointers) or throwing an exception (for references) if the cast is invalid.
-    - _(You will cover this in your OOP document.)_
+- Used _only_ for polymorphic OOP types (requires virtual functions).
+      - Safely casts a base-class pointer to a derived-class pointer, returning `nullptr` (for pointers) or throwing an exception (for references) if the cast is invalid.
+      - _(You will cover this in your OOP document.)_
 
 **Rule:** **Always** prefer C++ casts over C-style casts. They are safer and easier to search for.
 
----
-
-### 🎯 Type Punning
+## 🎯 Type Punning
 
 Type punning is accessing a piece of memory as a different type.
 
 - **C Method (via `union` or `reinterpret_cast`):** Accessing an inactive `union` member is _undefined behavior (UB)_ in C++.
-  ```cpp
-  // UB in C++!
-  union Pun { int i; float f; };
-  Pun p;
-  p.f = 3.14f;
-  int x = p.i; // Undefined Behavior
-  ```
+
+```cpp  
+// UB in C++!  
+union Pun { int i; float f; };  
+Pun p;  
+p.f = 3.14f;  
+int x = p.i; // Undefined Behavior  
+```
+
 - **C++ Method (via `reinterpret_cast`):** Also technically UB if you violate _strict aliasing_ rules.
-  ```cpp
-  float f = 3.14f;
-  int* p_i = reinterpret_cast<int*>(&f);
-  int x = *p_i; // Undefined Behavior
-  ```
+
+```cpp
+float f = 3.14f;  
+int* p_i =
+reinterpret_cast<int*>(&f);   int x = *p_i; // Undefined Behavior  
+```
+
 - **The Safe C++20 Method (`std::bit_cast`)**:
-  ```cpp
-  #include <bit>
-  float f = 3.14f;
-  int x = std::bit_cast<int>(f); // OK!
-  ```
+
+```cpp
+#include <bit>  
+float f = 3.14f;  
+int x = std::bit_cast<int>(f); // OK!  
+```
+
 - **The Safe Pre-C++20 Method (`memcpy`)**: This is optimized away by compilers and is the standard, safe way to do type punning.
-  ```cpp
-  #include <cstring>
-  float f = 3.14f;
-  int x;
-  std::memcpy(&x, &f, sizeof(int)); // OK!
-  ```
 
----
+```cpp
+#include <cstring>  
+float f = 3.14f;  
+int x;   std::memcpy(&x, &f, sizeof(int)); // OK!  
+```
 
-### ⚙️ The `auto` Keyword & Type Inference
+## ⚙️ The `auto` Keyword & Type Inference
 
 The `auto` keyword (C++11) directs the compiler to deduce the type of a variable from its initializer. This process is called **type inference**.
 
@@ -379,9 +412,7 @@ const auto* ptr_x = &x; // ptr_x is 'const int*'
 
 **Benefit:** Simplifies code, especially with complex types (like iterators or lambdas) and makes refactoring easier.
 
----
-
-### 📋 Initializer Lists & Uniform Initialization
+## 📋 Initializer Lists & Uniform Initialization
 
 C++11 introduced a "uniform initialization" syntax using curly braces `{}`. It's intended to be a more consistent and safer way to initialize variables.
 
@@ -407,6 +438,8 @@ int i = 3.14; // OK in C/C++. 'i' becomes 3 (data loss)
 // int j {3.14}; // COMPILE ERROR! Narrowing conversion disallowed.
 ```
 
+> Why to use initializer lists: [https://www.geeksforgeeks.org/cpp/when-do-we-use-initializer-list-in-c/](https://www.geeksforgeeks.org/cpp/when-do-we-use-initializer-list-in-c/)
+
 **`std::initializer_list`**
 This is a lightweight object that represents a list of values in braces. It's what allows `struct`s (and STL containers) to be initialized with `{...}`.
 
@@ -415,21 +448,130 @@ This is a lightweight object that represents a list of values in braces. It's wh
 #include <vector>
 
 void print_list(std::initializer_list<int> list) {
-    for (int x : list) { // Can be iterated
-        std::cout << x << " ";
-    }
+    for (int x : list) { // Can be iterated
+        std::cout << x << " ";
+    }
 }
 
 print_list({1, 2, 3, 4, 5}); // Compiler creates a std::initializer_list
 ```
 
----
+## 🔌 Linkage
+
+**Linkage** refers to how the "linker" (the program that combines object files - `.o` or `.obj`) resolves references to symbols (names of functions or variables) across different **translation units** (TUs -
+basically, each `.cpp` file).
+
+There are three main types of linkage in C++:
+
+1.  **No Linkage:**
+
+    - The symbol is only visible within its local scope (e.g., local variables in a function).
+    - The linker knows nothing about it.
+
+2.  **Internal Linkage:**
+
+    - The symbol is visible **only within its own translation unit** (its `.cpp` file).
+    - Each `.cpp` that defines it gets its own private copy.
+    - Achieved by using `static` (for global variables/functions) or by placing the symbol in an **anonymous namespace** (the preferred C++ method).
+
+3.  **External Linkage:**
+
+    - The symbol is visible **across all translation units** in the program.
+    - The linker ensures all references to this symbol point to **one single definition** (One Definition Rule - ODR).
+    - This is the default for non-`static` global functions and variables.
+    - The `extern` keyword is used to _declare_ (say "it exists somewhere") a symbol with external linkage, without _defining_ it.
+
+<!-- end list -->
+
+```cpp
+// ---- main.cpp ----
+#include <iostream>
+
+void func_external(); // Declaration (external linkage by default)
+extern int var_external; // Declaration
+
+// void func_internal(); // ERROR: func_internal has internal linkage in other.cpp
+// int var_internal = 10; // ERROR: var_internal has internal linkage in other.cpp
+
+namespace {
+    void func_anon() { std::cout << "main's anon func\n"; } // Internal linkage
+}
+
+int main() {
+    func_external(); // OK
+    std::cout << var_external << "\n"; // OK
+    func_anon(); // OK (calls main.cpp's version)
+    return 0;
+}
+
+// ---- other.cpp ----
+#include <iostream>
+
+// Definitions (External linkage)
+void func_external() { std::cout << "External Function\n"; }
+int var_external = 42;
+
+// Definitions (Internal linkage)
+static void func_internal() { /* ... */ }
+static int var_internal = 10;
+
+namespace {
+    void func_anon() { std::cout << "other's anon func\n"; } // Internal linkage
+}
+```
+
+#### Static vs. Dynamic Linking (Libraries)
+
+This is an extension of the linkage concept, referring to how code from libraries is included in your final executable.
+
+| Feature           | **Static Linking** (Static Libraries)                                                                                           | **Dynamic Linking** (Dynamic/Shared Libraries)                                                                                                                                                                                |
+| :---------------- | :------------------------------------------------------------------------------------------------------------------------------ | :---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **Files**         | `.lib` (Windows) <br> `.a` (Linux/macOS)                                                                                        | `.dll` + `.lib` (Windows) <br> `.so` (Linux) <br> `.dylib` (macOS)                                                                                                                                                            |
+| **Process**       | The linker **copies** the needed code from the static library directly into your final executable.                              | The linker stores only a **reference** (a "stub") to the library name and function.                                                                                                                                           |
+| **Result**        | A single, larger, **self-contained** executable file.                                                                           | A smaller executable + separate `.dll` / `.so` files, which **must** be present at runtime.                                                                                                                                   |
+| **At Runtime**    | Code is already in the executable.                                                                                              | The OS (dynamic linker/loader) loads the `.dll`/`.so` file into memory (if not already loaded) and resolves the function addresses.                                                                                           |
+| **Advantages**    | - **Portability:** Easy to distribute (one file). <br> - **Stability:** Not affected by system library updates (no "DLL Hell"). | - **Size:** Smaller executables. <br> - **Memory:** One copy of the library is shared in RAM by all programs using it. <br> - **Updates:** The library can be updated (e.g., security patch) without recompiling the program. |
+| **Disadvantages** | - **Size:** Much larger executables. <br> - **Updates:** Requires recompiling the program to get a library patch.               | - **Dependencies:** Requires distributing the correct `.dll`/`.so` files. <br> - **"DLL Hell":** Version conflicts with other installed libraries.                                                                            |
+
+### How to Create Libraries on Linux (g++)
+
+Assume you have source files `my_lib_code.cpp` and `my_lib_code.h`.
+
+**Static Library (`.a`)**
+
+```bash
+# 1. Compile source(s) to object file (.o)
+# -c: Compile only, do not link
+g++ -c my_lib_code.cpp -o my_lib_code.o
+
+# 2. Bundle object file(s) into a static library (.a)
+# ar: The 'archiver' utility
+# r: Replace existing files in the archive
+# c: Create the archive if it doesn't exist
+# s: Create a symbol index (speeds up linking)
+ar rcs libmylib.a my_lib_code.o
+```
+
+- **To Use:** `g++ main.cpp -L. -lmylib -o my_app` (or `g++ main.cpp libmylib.a -o my_app`)
+
+**Dynamic Library (`.so` - Shared Object)**
+
+```bash
+# 1. Compile source(s) to Position-Independent Code (.o)
+# -fPIC: Required for shared libraries so the code
+#        can be loaded at any memory address.
+g++ -c -fPIC my_lib_code.cpp -o my_lib_code.o
+
+# 2. Link object file(s) into a shared library (.so)
+# -shared: Tells the linker to produce a shared object
+g++ -shared -o libmylib.so my_lib_code.o
+```
+
+- **To Use:** `g++ main.cpp -L. -lmylib -o my_app` (You must also set `LD_LIBRARY_PATH` to include the directory with `.so` file, e.g., `export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:.`)
 
 ## 🔐 Const & Mutability
 
----
-
-### 🔐 `const` Keyword
+### `const` Keyword
 
 `const` in C++ is much stronger than in C.
 
@@ -454,35 +596,33 @@ int arr_2[get_size()]; // OK, get_size() is evaluated at compile time
 
 1.  **`const int ...` (Return Value):**
 
-    - `const int func(...)`
-    - Returns a `const` value. For simple types like `int`, this is mostly useless. For complex types, it prevents the caller from modifying the returned temporary.
-    - `func() = 5; // ILLEGAL`
+- `const int func(...)`
+      - Returns a `const` value. For simple types like `int`, this is mostly useless. For complex types, it prevents the caller from modifying the returned temporary.
+      - `func() = 5; // ILLEGAL`
 
 2.  **`... (const int param)` (Parameter):**
 
-    - The function promises not to change the value of `param` inside its body.
-    - This is critical when passing by reference or pointer to avoid copies and guarantee safety.
-    - `void func(const std::string& s)` (Pass by const reference)
+- The function promises not to change the value of `param` inside its body.
+      - This is critical when passing by reference or pointer to avoid copies and guarantee safety.
+      - `void func(const std::string& s)` (Pass by const reference)
 
 3.  **`... () const` (Member Function):**
 
-    - This _only_ applies to member functions of a `struct` or `class` (OOP).
-    - It promises that the function will _not modify any member variables_ of the object it's called on.
-    - It's a key part of `const`-correctness in OOP.
+- This _only_ applies to member functions of a `struct` or `class` (OOP).
+      - It promises that the function will _not modify any member variables_ of the object it's called on.
+      - It's a key part of `const`-correctness in OOP.
 
-**Pointer `const` (same as C):**
-Read from right to left.
+> **Pointer `const` (same as C):**
+> Read from right to left.
 
 ```cpp
-const int* p1;      // Pointer to a const int (value can't change)
-int const* p2;      // Same as p1
-int* const p3;      // Const pointer to an int (pointer can't change)
+const int* p1;      // Pointer to a const int (value can't change)
+int const* p2;      // Same as p1
+int* const p3;      // Const pointer to an int (pointer can't change)
 const int* const p4; // Const pointer to a const int
 ```
 
----
-
-### 🔧 `mutable` Keyword
+### `mutable` Keyword
 
 The `mutable` keyword is an exception to `const`. It allows a member of a `struct` (or `class`) to be modified, even if the `struct` instance is `const` (or inside a `const` member function).
 
@@ -490,23 +630,19 @@ Its use outside of OOP is rare, but it can be used in `const` lambdas.
 
 ```cpp
 struct Data {
-    int normal_val;
-    mutable int access_count; // e.g., for logging/caching
+    int normal_val;
+    mutable int access_count; // e.g., for logging/caching
 };
 
 void process(const Data& d) {
-    // d.normal_val = 15; // ILLEGAL! 'd' is const
-    d.access_count++; // OK! 'access_count' is mutable
+    // d.normal_val = 15; // ILLEGAL! 'd' is const
+    d.access_count++; // OK! 'access_count' is mutable
 }
 ```
 
----
-
 ## Functions & Callables
 
----
-
-### 🎯 Function Pointers & Lambdas
+## 🎯 Function Pointers & Lambdas
 
 #### Function Pointers
 
@@ -530,9 +666,7 @@ int result = my_op(5, 3);
 - **Strategy Pattern:** Implementing interchangeable algorithms.
 - **Dynamic Libraries:** Loading functions by name from `.dll` or `.so` files (e.g., `dlsym()`).
 
----
-
-#### Lambda Expressions (C++11)
+## Lambda Expressions (C++11)
 
 A **lambda** is a convenient, inline, anonymous function. It's one of the most powerful features of modern C++.
 
@@ -551,32 +685,129 @@ int y = 20;
 
 // A simple lambda that adds two numbers
 auto my_add = [](int a, int b) -> int {
-    return a + b;
+    return a + b;
 };
 int result = my_add(5, 3); // 8
 
 // A lambda that captures local state
 auto add_x_and_y = [=]() { // Captures x and y by value
-    return x + y;
+    return x + y;
 };
 int result2 = add_x_and_y(); // 30
 
 // A lambda that modifies local state
 auto increment_x = [&x]() { // Captures x by reference
-    x++;
+    x++;
 };
 increment_x(); // 'x' is now 11
 ```
 
 Lambdas are the preferred C++ way to handle "callbacks" and are fundamental to the STL algorithms.
 
----
+## 🔧 Default Parameter Functions
+
+You can assign default values to function parameters in its declaration. If a caller omits that argument, the default value will be used.
+
+**Rules:**
+
+1.  Default parameters must be at the **end** of the parameter list.
+2.  Once a parameter has a default value, all parameters after it must also have default values.
+
+<!-- end list -->
+
+```cpp
+// Declaration (usually in a .h file)
+void log(const std::string& message, int level = 0, bool timestamp = false);
+
+// Possible calls
+log("File not found", 2, true); // No default values used
+log("User logged in", 1);     // timestamp = false (default)
+log("App started");           // level = 0, timestamp = false (default)
+
+// log("Message", true); // ERROR: Compiler thinks 'true' (1) is 'level'
+// log("Message", , true); // ERROR: Invalid syntax
+
+// ---- IMPLEMENTATION ----
+// void log(const std::string& message, int level = 0, bool timestamp = false) // ERROR
+void log(const std::string& message, int level, bool timestamp) // OK
+{
+    // Default values go ONLY in the declaration, NOT the definition
+    // (unless the declaration IS the definition)
+    if (timestamp) {
+        std::cout << "[...timestamp...] ";
+    }
+    std::cout << "[L" << level << "] " << message << "\n";
+}
+```
+
+| Valid Syntax       | `void func(int a, int b = 10, int c = 20);` |
+| :----------------- | :------------------------------------------ |
+| **Invalid Syntax** | `void func(int a = 10, int b, int c = 20);` |
+
+## Exception Handling
+
+## 💥 Try - Catch - Throw
+
+C++ handles runtime errors through an **exception handling** system. This allows transferring control from where an error is detected (using `throw`) to a "handler" that can manage it (using `try...catch`).
+
+- **`throw`**: Throws an exception. You can throw any object (though throwing objects that inherit from `std::exception` is recommended).
+- **`try`**: Marks a block of code where exceptions _might_ occur.
+- **`catch`**: Catches and handles an exception. It must immediately follow a `try` block.
+
+When an exception is thrown, normal execution stops, and the program searches "up" the call stack for the first `catch` block that matches the type of the thrown exception. This process is called **"stack unwinding"**. As the stack is unwound, destructors for all local objects (including smart pointers) are automatically called, ensuring resources are released (the **RAII** principle).
+
+```cpp
+#include <iostream>
+#include <stdexcept> // For standard exceptions (e.g., std::runtime_error)
+
+double divide(int a, int b) {
+    if (b == 0) {
+        // Throw an exception of a specific type
+        throw std::runtime_error("Division by zero!");
+    }
+    return static_cast<double>(a) / b;
+}
+
+int main() {
+    try {
+        // Monitored block of code
+        double result1 = divide(10, 2);
+        std::cout << "Result 1: " << result1 << "\n";
+
+        double result2 = divide(10, 0); // This line will throw
+        std::cout << "Result 2: " << result2 << "\n"; // This line will not be executed
+
+    } catch (const std::runtime_error& e) {
+        // Specific handler for std::runtime_error (and its derived classes)
+        // We catch by const reference!
+        std::cerr << "Caught runtime_error: " << e.what() << "\n";
+        // e.what() is a method from std::exception that returns the message
+
+    } catch (const std::exception& e) {
+        // Handler for other standard exceptions (must come after specific ones)
+        std::cerr << "Caught other std::exception: " << e.what() << "\n";
+
+    } catch (...) {
+        // "Catch-all" handler. Catches absolutely anything (including int, char*, etc.)
+        // Rarely used, as a last resort.
+        std::cerr << "Caught an unknown exception!\n";
+    }
+
+    std::cout << "Program continues execution...\n";
+    return 0;
+}
+```
+
+**Best Practices:**
+
+1.  **Throw by value, catch by constant reference** (`throw std::runtime_error("...")`, `catch (const std::exception& e)`). This avoids unnecessary copies and "object slicing."
+2.  Order `catch` blocks from **most specific to most general**.
+3.  Use exceptions for **exceptional** errors, not for normal program flow (e.g., don't use exceptions to break a `for` loop).
+4.  Write "exception-safe" code using RAII (e.g., `std::unique_ptr`, `std::lock_guard`).
 
 ## Templates
 
 Templates are the C++ mechanism for **generic programming**. They allow you to write functions and `struct`s/`class`es that can operate on any data type. The type is specified as a parameter _at compile time_.
-
----
 
 ### 🛠️ Template Functions
 
@@ -586,7 +817,7 @@ A single function definition that can be instantiated by the compiler for many d
 // A template function 'T' is the template parameter
 template <typename T>
 T add(T a, T b) {
-    return a + b;
+    return a + b;
 }
 
 // Compiler auto-generates versions of 'add'
@@ -595,8 +826,6 @@ double d = add(3.14, 2.71); // Instantiates add<double>(double, double)
 std::string s = add(std::string("Hello"), std::string(" World")); // Instantiates add<std::string>(...)
 ```
 
----
-
 ### 🛠️ Template Structs (Classes)
 
 A single `struct` definition that can be instantiated for different types. This is the basis for all STL containers (like `std::vector<T>`).
@@ -604,8 +833,8 @@ A single `struct` definition that can be instantiated for different types. This 
 ```cpp
 template <typename T1, typename T2>
 struct Pair {
-    T1 first;
-    T2 second;
+    T1 first;
+    T2 second;
 };
 
 // Instantiate a Pair of int and double
@@ -622,11 +851,7 @@ p2.second = 30;
 Pair p3 {"hello", 5}; // Compiler deduces Pair<const char*, int>
 ```
 
----
-
 ## Memory & Concurrency
-
----
 
 ### 🧠 Smart Pointers
 
@@ -634,93 +859,85 @@ Found in `<memory>`. They manage memory automatically using a principle called *
 
 1.  **`std::unique_ptr<T>` (C++11)**
 
-    - **Exclusive ownership.** Only one `unique_ptr` can point to an object.
-    - When the `unique_ptr` goes out of scope, it automatically `delete`s the object.
-    - It's lightweight (zero-cost abstraction, same size as a raw pointer).
-    - It **cannot** be copied. It can only be **moved**.
+- **Exclusive ownership.** Only one `unique_ptr` can point to an object.
+      - When the `unique_ptr` goes out of scope, it automatically `delete`s the object.
+      - It's lightweight (zero-cost abstraction, same size as a raw pointer).
+      - It **cannot** be copied. It can only be **moved**.
 
-    <!-- end list -->
+```cpp
+    #include <memory>
 
-    ```cpp
-    #include <memory>
+void use_smart_ptr() {
+        // Create (use std::make_unique, C++14)
+        auto u_ptr = std::make_unique<int>(42);
 
-    void use_smart_ptr() {
-        // Create (use std::make_unique, C++14)
-        auto u_ptr = std::make_unique<int>(42);
+// Access
+        \*u_ptr = 100;
 
-        // Access
-        *u_ptr = 100;
+// Pass ownership (move)
+        std::unique_ptr<int> other_ptr = std::move(u_ptr);
+        // 'u_ptr' is now nullptr
 
-        // Pass ownership (move)
-        std::unique_ptr<int> other_ptr = std::move(u_ptr);
-        // 'u_ptr' is now nullptr
-
-    } // 'other_ptr' goes out of scope, 'int' is automatically deleted
-    ```
+} // 'other_ptr' goes out of scope, 'int' is automatically deleted
+```
 
 2.  **`std::shared_ptr<T>` (C++11)**
 
-    - **Shared ownership.** Multiple `shared_ptr`s can point to the same object.
-    - Keeps an internal _reference count_.
-    - When the _last_ `shared_ptr` is destroyed, the object is `delete`d.
-    - Has a small overhead (for the control block/ref count).
+- **Shared ownership.** Multiple `shared_ptr`s can point to the same object.
+      - Keeps an internal _reference count_.
+      - When the _last_ `shared_ptr` is destroyed, the object is `delete`d.
+      - Has a small overhead (for the control block/ref count).
 
-    <!-- end list -->
+```cpp
+    void use_shared_ptr() {
+        // Create (use std::make_shared, C++11)
+        auto s_ptr = std::make_shared<int>(50);
+        // Ref count is 1
 
-    ```cpp
-    void use_shared_ptr() {
-        // Create (use std::make_shared, C++11)
-        auto s_ptr = std::make_shared<int>(50);
-        // Ref count is 1
+{
+            auto s_ptr_copy = s_ptr; // Copy. Ref count is now 2
+            \*s_ptr_copy = 100;
+        } // 's_ptr_copy' destroyed. Ref count is 1
 
-        {
-            auto s_ptr_copy = s_ptr; // Copy. Ref count is now 2
-            *s_ptr_copy = 100;
-        } // 's_ptr_copy' destroyed. Ref count is 1
-
-    } // 's_ptr' destroyed. Ref count is 0. Object is deleted.
-    ```
+} // 's_ptr' destroyed. Ref count is 0. Object is deleted.
+```
 
 3.  **`std::weak_ptr<T>` (C++11)**
 
-    - A non-owning, "weak" observer of a `shared_ptr`.
-    - It **does not** increase the reference count.
-    - Used to break circular references (e.g., two objects with `shared_ptr`s to each other).
-    - You must `lock()` it to get a temporary `shared_ptr` to safely access the object.
+- A non-owning, "weak" observer of a `shared_ptr`.
+      - It **does not** increase the reference count.
+    T - Used to break circular references (e.g., two objects with `shared_ptr`s to each other).
+      - You must `lock()` it to get a temporary `shared_ptr` to safely access the object.
 
-    <!-- end list -->
+```cpp
+  s std::weak_ptr<int> w_ptr;
+    {
+        auto s_ptr = std::make_shared<int>(99);
+        w_ptr = s_ptr; // w_ptr observes s_ptr. Ref count is 1.
 
-    ```cpp
-    std::weak_ptr<int> w_ptr;
-    {
-        auto s_ptr = std::make_shared<int>(99);
-        w_ptr = s_ptr; // w_ptr observes s_ptr. Ref count is 1.
+if (auto temp_shared = w_ptr.lock()) { // Try to get a valid shared_ptr
+            std::cout << \*temp_shared << "\\n"; // Prints 99
+        }
+    } // s_ptr destroyed. Object deleted.
 
-        if (auto temp_shared = w_ptr.lock()) { // Try to get a valid shared_ptr
-            std::cout << *temp_shared << "\n"; // Prints 99
-        }
-    } // s_ptr destroyed. Object deleted.
+if (auto temp_shared = w_ptr.lock()) {
+        // Fails. w_ptr.lock() returns empty shared_ptr
+    } else {
+        std::cout << "Object expired.\\n";
+    }
+```
 
-    if (auto temp_shared = w_ptr.lock()) {
-        // Fails. w_ptr.lock() returns empty shared_ptr
-    } else {
-        std::cout << "Object expired.\n";
-    }
-    ```
-
----
-
-### 🚚 lvalues, rvalues, & Move Semantics
+## 🚚 lvalues, rvalues, & Move Semantics
 
 This is a C++11 concept for optimizing away expensive copies.
 
 - **lvalue (locator value):** An expression that has an identity (a name, an address). You can take its address.
-  - `int x = 10;` (`x` is an lvalue)
-  - `std::string s = "hi";` (`s` is an lvalue)
+    - `int x = 10;` (`x` is an lvalue)
+    - `std::string s = "hi";` (`s` is an lvalue)
 - **rvalue (right value):** A temporary expression that has no identity and "expires" at the end of the statement. You cannot take its address.
-  - `10` is an rvalue
-  - `x + 5` is an rvalue
-  - `std::string("hi")` is an rvalue
+    - `10` is an rvalue
+    - `x + 5` is an rvalue
+    - `std::string("hi")` is an rvalue
 
 **Rvalue References (`&&`)**
 A reference that can _only_ bind to a temporary (an rvalue). This is the key to "stealing" resources.
@@ -744,38 +961,36 @@ This is what makes `std::move` useful. A **move constructor** is a special const
 #include <utility> // for std::move
 
 struct Buffer {
-    char* data_ = nullptr;
-    size_t size_ = 0;
+    char* data_ = nullptr;
+    size_t size_ = 0;
 
-    // Copy Constructor (deep copy)
-    Buffer(const Buffer& other) {
-        data_ = new char[other.size_];
-        std::memcpy(data_, other.data_, other.size_);
-        size_ = other.size_;
-    }
+    // Copy Constructor (deep copy)
+    Buffer(const Buffer& other) {
+        data_ = new char[other.size_];
+        std::memcpy(data_, other.data_, other.size_);
+        size_ = other.size_;
+    }
 
-    // Move Constructor (shallow copy + "steal")
-    Buffer(Buffer&& other) noexcept { // Takes an rvalue reference (&&)
-        data_ = other.data_; // Steal pointer
-        size_ = other.size_;
+    // Move Constructor (shallow copy + "steal")
+    Buffer(Buffer&& other) noexcept { // Takes an rvalue reference (&&)
+        data_ = other.data_; // Steal pointer
+        size_ = other.size_;
 
-        other.data_ = nullptr; // Leave old object empty
-        other.size_ = 0;
-    }
-    // ... destructor, assignment operators, etc.
+        other.data_ = nullptr; // Leave old object empty
+        other.size_ = 0;
+    }
+    // ... destructor, assignment operators, etc.
 };
 
 Buffer b1; // Assume b1 holds a large 10MB buffer
 Buffer b2 = b1; // Calls COPY constructor. We now have 20MB in use.
 Buffer b3 = std::move(b1); // Calls MOVE constructor. Still 10MB in use.
-                           // b3 now owns the buffer, b1 is empty.
+                           // b3 now owns the buffer, b1 is empty.
 ```
 
 This is how `std::unique_ptr` and `std::string` transfer ownership efficiently.
 
----
-
-### 🧵 Threads & Concurrency
+## 🧵 Threads & Concurrency
 
 C++11 introduced a standard thread library (`<thread>`, `<mutex>`, `<atomic>`).
 
@@ -793,13 +1008,11 @@ C++11 introduced a standard thread library (`<thread>`, `<mutex>`, `<atomic>`).
 #include <iostream>
 
 void thread_func(int id) {
-    std::cout << "Hello from thread " << id << "\n";
+    std::cout << "Hello from thread " << id << "\n";
 }
 std::thread t1(thread_func, 1); // Create and run thread
 t1.join(); // Wait for t1 to finish
 ```
-
----
 
 #### `std::mutex` (Mutual Exclusion)
 
@@ -812,9 +1025,9 @@ int g_counter = 0;
 std::mutex g_mutex; // A mutex to protect g_counter
 
 void safe_increment() {
-    g_mutex.lock(); // Lock the mutex (wait if another thread has it)
-    g_counter++;
-    g_mutex.unlock(); // Unlock the mutex
+    g_mutex.lock(); // Lock the mutex (wait if another thread has it)
+    g_counter++;
+    g_mutex.unlock(); // Unlock the mutex
 }
 ```
 
@@ -823,15 +1036,13 @@ Manually calling `lock()` and `unlock()` is error-prone (e.g., if an exception h
 
 ```cpp
 void safer_increment() {
-    // Lock is acquired on construction
-    std::lock_guard<std::mutex> lock(g_mutex);
-    g_counter++;
+    // Lock is acquired on construction
+    std::lock_guard<std::mutex> lock(g_mutex);
+    g_counter++;
 } // 'lock' goes out of scope, mutex is automatically unlocked
 ```
 
 _(Other lock types exist, like `std::unique_lock` which is more flexible but heavier.)_
-
----
 
 #### `std::atomic`
 
@@ -843,19 +1054,15 @@ For simple types (like `int`, `bool`, pointers), a **mutex** is often overkill. 
 std::atomic<int> g_atomic_counter = 0;
 
 void atomic_increment() {
-    g_atomic_counter++; // This is now a thread-safe atomic operation
+    g_atomic_counter++; // This is now a thread-safe atomic operation
 }
 ```
 
 Use `std::atomic` for simple flags and counters. Use `std::mutex` to protect larger or more complex data structures.
 
----
-
 ## 🔤 Strings & Regex
 
----
-
-### 🔤 `std::string` & Manipulation
+## 🔤 `std::string` & Manipulation
 
 Found in `<string>`. `std::string` is the C++ replacement for C-style `char*` strings. It handles its own memory management.
 
@@ -873,22 +1080,20 @@ s3.append(" Welcome."); // "Hello, World! Welcome."
 
 **Common Manipulation Methods:**
 
-| Method                     | Example                     | Description                                                    |
-| -------------------------- | --------------------------- | -------------------------------------------------------------- |
-| `s.substr(pos, len)`       | `s3.substr(0, 5)`           | Returns `"Hello"` (substring).                                 |
-| `s.find(str)`              | `s3.find("World")`          | Returns `7` (index). Returns `std::string::npos` if not found. |
-| `s.find_first_of(chars)`   | `s3.find_first_of("abcde")` | Returns `1` ('e'). Finds first char from the set.              |
-| `s.find_last_of(chars)`    | `s3.find_last_of("abcde")`  | Returns `20` ('e' in Welcome). Finds last char from the set.   |
-| `s.replace(pos, len, str)` | `s3.replace(0, 5, "Hi")`    | Changes `s3` to `"Hi, World! Welcome."`                        |
-| `s.insert(pos, str)`       | `s3.insert(0, "Well, ")`    | Changes `s3` to `"Well, Hi, World!..."`                        |
-| `s.erase(pos, len)`        | `s3.erase(0, 6)`            | Changes `s3` to `"Hi, World!..."` (removes "Well, ")           |
-| `s.c_str()`                | `printf("%s", s3.c_str())`  | Returns a `const char*` for C-style APIs.                      |
-| `s.length()` / `s.size()`  | `s3.length()`               | Returns the number of characters.                              |
-| `s.empty()`                | `s1.empty()`                | Returns `false`.                                               |
+| Method                      | Example                      | Description                                                      |
+| --------------------------- | ---------------------------- | ---------------------------------------------------------------- |
+| `s.substr(pos, len)`        | `s3.substr(0, 5)`            | Returns `"Hello"` (substring).                                   |
+| `s.find(str)`               | `s3.find("World")`           | Returns `7` (index). Returns `std::string::npos` if not found.   |
+| `s.find_first_of(chars)`    | `s3.find_first_of("abcde")`  | Returns `1` ('e'). Finds first char from the set.                |
+| `s.find_last_of(chars)`     | `s3.find_last_of("abcde")`   | Returns `20` ('e' in Welcome). Finds last char from the set.     |
+| `s.replace(pos, len, str)`  | `s3.replace(0, 5, "Hi")`     | Changes `s3` to `"Hi, World! Welcome."`                          |
+| `s.insert(pos, str)`        | `s3.insert(0, "Well, ")`     | Changes `s3` to `"Well, Hi, World!..."`                          |
+| `s.erase(pos, len)`         | `s3.erase(0, 6)`             | Changes `s3` to `"Hi, World!..."` (removes "Well, ") d           |
+| `s.c_str()`                 | `printf("%s", s3.c_str())`   | Returns a `const char*` for C-style APIs.                        |
+| `s.length()` / `s.size()`   | `s3.length()`                | Returns the number of characters.                                |
+| `s.empty()`                 | `s1.empty()`                 | Returns `false`.                                                 |
 
----
-
-### 🌊 `std::stringstream`
+## 🌊 `std::stringstream`
 
 Found in `<sstream>`. An in-memory stream used for converting between strings and other data types. Replaces `sprintf` and `sscanf`.
 
@@ -912,9 +1117,7 @@ double val_d;
 ss_in >> val_i >> val_d; // val_i is 10, val_d is 20.5
 ```
 
----
-
-### 🔍 `std::regex`
+## 🔍 `std::regex`
 
 Found in `<regex>`. C++11 added a standard library for **regular expressions** (Perl-compatible syntax by default).
 
@@ -931,68 +1134,14 @@ std::smatch match; // 's' for string
 
 // 3. Search the string
 if (std::regex_search(log_line, match, r)) {
-    // match[0] is the full match ("ERROR 123")
-    // match[1] is the first capture group ("ERROR")
-    // match[2] is the second capture group ("123")
-    std::cout << "Type: " << match[1] << "\n";
-    std::cout << "Code: " << match[2] << "\n";
+    // match[0] is the full match ("ERROR 123")
+    // match[1] is the first capture group ("ERROR")
+    // match[2] is the second capture group ("123")
+    std::cout << "Type: " << match[1] << "\n";
+    std::cout << "Code: " << match[2] << "\n";
 }
 ```
 
 - **`std::regex_search`**: Checks if a pattern _exists_ anywhere in the string.
 - **`std::regex_match`**: Checks if the _entire string_ matches the pattern.
 - **`std::regex_replace`**: Replaces matches with new text.
-
----
-
-## Miscellaneous
-
----
-
-### ❓ Ternary Operator
-
-Identical to C.
-`condition ? expression_if_true : expression_if_false`
-
-```cpp
-int x = 10;
-int y = 20;
-int max_val = (x > y) ? x : y; // max_val is 20
-```
-
----
-
-### 🚶 Iterators
-
-An **iterator** is an object that acts like a "generalized pointer." It's the core concept that connects STL algorithms to STL containers. It provides a uniform API for traversing a sequence of elements, regardless of how that sequence is stored (e.g., in an array, a list, etc.).
-
-Since you are not covering STL containers, think of them as an abstraction over pointers.
-
-```cpp
-#include <vector> // (Included just for a C++ style example)
-
-int C_array[] = {10, 20, 30, 40, 50};
-
-// C-style "iteration" using pointers
-for (int* ptr = C_array; ptr != C_array + 5; ++ptr) {
-    std::cout << *ptr << " "; // 10 20 30 40 50
-}
-
-// C++ style "iteration" using iterators
-std::vector<int> vec = {10, 20, 30, 40, 50};
-
-for (std::vector<int>::iterator it = vec.begin(); it != vec.end(); ++it) {
-    std::cout << *it << " "; // 10 20 30 40 50
-}
-
-// C++11 "range-based for loop" (syntactic sugar for iterators)
-for (int val : vec) {
-    std::cout << val << " "; // 10 20 30 40 50
-}
-```
-
-| Iterator "Pointer" | `vec.begin()` | Returns an iterator to the _first_ element.         |
-| ------------------ | ------------- | --------------------------------------------------- |
-| Iterator "Null"    | `vec.end()`   | Returns an iterator to _one-past-the-last_ element. |
-| Dereference        | `*it`         | Accesses the element's value.                       |
-| Increment          | `++it`        | Moves the iterator to the next element.             |
