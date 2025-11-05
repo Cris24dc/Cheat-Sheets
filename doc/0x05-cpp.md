@@ -1,5 +1,3 @@
-Gata, am tradus înapoi în engleză secțiunile noi pe care le-am adăugat.
-
 # C++ Cheat Sheet
 
 <img src="../img/cpp/cpp.jpg">
